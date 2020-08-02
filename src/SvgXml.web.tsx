@@ -12,7 +12,7 @@ type SvgXmlProps = XmlProps &
     title?: string;
   };
 const SvgXml = React.forwardRef<HTMLOrSVGElement, SvgXmlProps>(
-  ({ xml, ...props }) => {
+  ({ xml, ...props }, fowardRef) => {
     const { attributes, innerSVG } = parseSVG(xml);
     const camelAttributes = kebabToCamel(attributes);
 
@@ -45,9 +45,14 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, SvgXmlProps>(
 
     const finalProps = { ...camelAttributes, ...overrideProps };
     const Svg = unstable_createElement('svg', { ref: svgRef, ...finalProps });
+
+    const containerDefaultStyles = {
+      width,
+      height,
+    };
     return (
-      <View {...containerProps}>
-        <Svg />
+      <View ref={fowardRef} {...containerProps} style={containerDefaultStyles}>
+        {Svg}
       </View>
     );
   },
@@ -70,7 +75,7 @@ function matchAll(str) {
 }
 
 function parseSVG(svg: string) {
-  const content = svg.match(/<svg(*.)<\/svg>/ims)[1];
+  const content = svg.match(/<svg(.*)<\/svg>/ims)[1];
   const [, attrs, innerSVG] = content.match(/(.*?)>(.*)/ims);
   const attributes = [
     ...matchAll(attrs)(/([a-z0-9]+)(=['"](.*?)['"])?[\s>]/gims),
