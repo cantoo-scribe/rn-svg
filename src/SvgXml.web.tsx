@@ -2,6 +2,29 @@ import React from 'react';
 import { ViewProps } from 'react-native';
 import { View, unstable_createElement } from 'react-native-web';
 import { XmlProps } from './xml';
+/*
+
+  ColumnMajorTransformMatrix
+
+  [a, b, c, d, tx, ty]
+
+  This matrix can be visualized as:
+
+  ╔═      ═╗
+  ║ a c tx ║
+  ║ b d ty ║
+  ║ 0 0 1  ║
+  ╚═      ═╝
+
+*/
+export type ColumnMajorTransformMatrix = [
+  number,
+  number,
+  number,
+  number,
+  number,
+  number,
+];
 // rgba values inside range 0 to 1 inclusive
 // rgbaArray = [r, g, b, a]
 export type rgbaArray = ReadonlyArray<number>;
@@ -15,7 +38,23 @@ type Linecap = 'butt' | 'square' | 'round';
 type Linejoin = 'miter' | 'bevel' | 'round';
 type Color = int32ARGBColor | rgbaArray | string;
 type NumberArray = NumberProp[] | NumberProp;
-
+interface TransformObject {
+  translate?: NumberArray;
+  translateX?: NumberProp;
+  translateY?: NumberProp;
+  origin?: NumberArray;
+  originX?: NumberProp;
+  originY?: NumberProp;
+  scale?: NumberArray;
+  scaleX?: NumberProp;
+  scaleY?: NumberProp;
+  skew?: NumberArray;
+  skewX?: NumberProp;
+  skewY?: NumberProp;
+  rotation?: NumberProp;
+  x?: NumberArray;
+  y?: NumberArray;
+}
 type SvgXmlProps = XmlProps &
   ViewProps & {
     height: NumberProp;
@@ -38,6 +77,7 @@ type SvgXmlProps = XmlProps &
     strokeMiterlimit?: NumberProp;
     clipRule?: FillRule;
     clipPath?: string;
+    transform?: ColumnMajorTransformMatrix | string | TransformObject;
     translate?: NumberArray;
     translateX?: NumberProp;
     translateY?: NumberProp;
@@ -100,27 +140,12 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, SvgXmlProps>(
       strokeLinecap,
       strokeLinejoin,
       strokeMiterlimit,
+      transform,
       clipRule,
       clipPath,
-      translate,
-      translateX,
-      translateY,
-      origin,
-      originX,
-      originY,
-      scale,
-      scaleX,
-      scaleY,
-      skew,
-      skewX,
-      skewY,
-      rotation,
-      x,
-      y,
       vectorEffect,
       pointerEvents,
       id,
-      marker,
       markerStart,
       markerMid,
       markerEnd,
@@ -149,27 +174,12 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, SvgXmlProps>(
       strokeLinecap,
       strokeLinejoin,
       strokeMiterlimit,
+      transform,
       clipRule,
       clipPath,
-      translate,
-      translateX,
-      translateY,
-      origin,
-      originX,
-      originY,
-      scale,
-      scaleX,
-      scaleY,
-      skew,
-      skewX,
-      skewY,
-      rotation,
-      x,
-      y,
       vectorEffect,
       pointerEvents,
       id,
-      marker,
       markerStart,
       markerMid,
       markerEnd,
