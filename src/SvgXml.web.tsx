@@ -2,14 +2,71 @@ import React from 'react';
 import { ViewProps } from 'react-native';
 import { View, unstable_createElement } from 'react-native-web';
 import { XmlProps } from './xml';
+// rgba values inside range 0 to 1 inclusive
+// rgbaArray = [r, g, b, a]
+export type rgbaArray = ReadonlyArray<number>;
+
+// argb values inside range 0x00 to 0xff inclusive
+// int32ARGBColor = 0xaarrggbb
+export type int32ARGBColor = number;
+type NumberProp = string | number;
+type FillRule = 'evenodd' | 'nonzero';
+type Linecap = 'butt' | 'square' | 'round';
+type Linejoin = 'miter' | 'bevel' | 'round';
+type Color = int32ARGBColor | rgbaArray | string;
+type NumberArray = NumberProp[] | NumberProp;
+
 type SvgXmlProps = XmlProps &
   ViewProps & {
-    height: number | string;
-    width: number | string;
+    height: NumberProp;
+    width: NumberProp;
     viewBox?: string;
     preserveAspectRatio?: string;
-    color?: string;
+    color?: Color;
     title?: string;
+    opacity?: NumberProp;
+    fill?: Color;
+    fillOpacity?: number;
+    fillRule?: FillRule;
+    stroke?: Color;
+    strokeWidth?: NumberProp;
+    strokeOpacity?: NumberProp;
+    strokeDasharray?: ReadonlyArray<NumberProp> | NumberProp;
+    strokeDashoffset?: NumberProp;
+    strokeLinecap?: Linecap;
+    strokeLinejoin?: Linejoin;
+    strokeMiterlimit?: NumberProp;
+    clipRule?: FillRule;
+    clipPath?: string;
+    translate?: NumberArray;
+    translateX?: NumberProp;
+    translateY?: NumberProp;
+    origin?: NumberArray;
+    originX?: NumberProp;
+    originY?: NumberProp;
+    scale?: NumberArray;
+    scaleX?: NumberProp;
+    scaleY?: NumberProp;
+    skew?: NumberArray;
+    skewX?: NumberProp;
+    skewY?: NumberProp;
+    rotation?: NumberProp;
+    x?: NumberArray;
+    y?: NumberArray;
+    vectorEffect?:
+      | 'none'
+      | 'non-scaling-stroke'
+      | 'nonScalingStroke'
+      | 'default'
+      | 'inherit'
+      | 'uri';
+    pointerEvents?: 'box-none' | 'none' | 'box-only' | 'auto';
+    id?: string;
+    marker?: string;
+    markerStart?: string;
+    markerMid?: string;
+    markerEnd?: string;
+    mask?: string;
   };
 const SvgXml = React.forwardRef<HTMLOrSVGElement, SvgXmlProps>(
   ({ xml, ...props }, fowardRef) => {
@@ -30,17 +87,93 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, SvgXmlProps>(
       viewBox,
       preserveAspectRatio,
       color,
+      title,
+      opacity,
+      fill,
+      fillOpacity,
+      fillRule,
+      stroke,
+      strokeWidth,
+      strokeOpacity,
+      strokeDasharray,
+      strokeDashoffset,
+      strokeLinecap,
+      strokeLinejoin,
+      strokeMiterlimit,
+      clipRule,
+      clipPath,
+      translate,
+      translateX,
+      translateY,
+      origin,
+      originX,
+      originY,
+      scale,
+      scaleX,
+      scaleY,
+      skew,
+      skewX,
+      skewY,
+      rotation,
+      x,
+      y,
+      vectorEffect,
+      pointerEvents,
+      id,
+      marker,
+      markerStart,
+      markerMid,
+      markerEnd,
+      mask,
       // props that should be applyed to the View container
       ...containerProps
     } = props;
 
     // these props should override the xml props
     const overrideProps = {
-      height,
-      width,
+      height: '100%',
+      width: '100%',
       viewBox,
       preserveAspectRatio,
       color,
+      title,
+      opacity,
+      fill,
+      fillOpacity,
+      fillRule,
+      stroke,
+      strokeWidth,
+      strokeOpacity,
+      strokeDasharray,
+      strokeDashoffset,
+      strokeLinecap,
+      strokeLinejoin,
+      strokeMiterlimit,
+      clipRule,
+      clipPath,
+      translate,
+      translateX,
+      translateY,
+      origin,
+      originX,
+      originY,
+      scale,
+      scaleX,
+      scaleY,
+      skew,
+      skewX,
+      skewY,
+      rotation,
+      x,
+      y,
+      vectorEffect,
+      pointerEvents,
+      id,
+      marker,
+      markerStart,
+      markerMid,
+      markerEnd,
+      mask,
     };
 
     const finalProps = { ...camelAttributes, ...overrideProps };
