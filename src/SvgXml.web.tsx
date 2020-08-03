@@ -132,6 +132,7 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, SvgXmlProps>(
       fill,
       fillOpacity,
       fillRule,
+      transform,
       stroke,
       strokeWidth,
       strokeOpacity,
@@ -140,7 +141,6 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, SvgXmlProps>(
       strokeLinecap,
       strokeLinejoin,
       strokeMiterlimit,
-      transform,
       clipRule,
       clipPath,
       vectorEffect,
@@ -150,14 +150,47 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, SvgXmlProps>(
       markerMid,
       markerEnd,
       mask,
+      originX,
+      originY,
+      translate,
+      scale,
+      rotation,
+      skewX,
+      skewY,
       // props that should be applyed to the View container
       ...containerProps
     } = props;
+
+    const transformArr = [];
+
+    if (originX != null || originY != null) {
+      transformArr.push(`translate(${originX || 0}, ${originY || 0})`);
+    }
+    if (translate != null) {
+      transformArr.push(`translate(${translate})`);
+    }
+    if (scale != null) {
+      transformArr.push(`scale(${scale})`);
+    }
+    // rotation maps to rotate, not to collide with the text rotate attribute (which acts per glyph rather than block)
+    if (rotation != null) {
+      transformArr.push(`rotate(${rotation})`);
+    }
+    if (skewX != null) {
+      transformArr.push(`skewX(${skewX})`);
+    }
+    if (skewY != null) {
+      transformArr.push(`skewY(${skewY})`);
+    }
+    if (originX != null || originY != null) {
+      transformArr.push(`translate(${-originX || 0}, ${-originY || 0})`);
+    }
 
     // these props should override the xml props
     const overrideProps = {
       height: '100%',
       width: '100%',
+      transform: transformArr.length ? transformArr.join(' ') : transform,
       viewBox,
       preserveAspectRatio,
       color,
@@ -174,7 +207,6 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, SvgXmlProps>(
       strokeLinecap,
       strokeLinejoin,
       strokeMiterlimit,
-      transform,
       clipRule,
       clipPath,
       vectorEffect,

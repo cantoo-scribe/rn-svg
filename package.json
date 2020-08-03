@@ -105,6 +105,6 @@
   },
   "nativePackage": true,
   "optionalDependencies": {
-    "react-native-web": "^0.13.4"
+    "react-native-web": ">=0.13.4"
   }
 }

@@ -10,6 +10,8 @@ import {
 import { NumberArray, NumberProp } from './lib/extract/types';
 import SvgTouchableMixin from './lib/SvgTouchableMixin';
 import { resolve } from './lib/resolve';
+export { default as SvgXml } from './SvgXml.web';
+export { default as SvgCss } from './SvgXml.web';
 
 const createElement = cE || ucE;
 
