@@ -1,7 +1,23 @@
 import React from 'react';
-import { ViewProps } from 'react-native';
+import {
+  ViewProps,
+  GestureResponderHandlers,
+  GestureResponderEvent,
+} from 'react-native';
 import { View, unstable_createElement } from 'react-native-web';
-import { XmlProps } from './xml';
+// rgba values inside range 0 to 1 inclusive
+// rgbaArray = [r, g, b, a]
+export type rgbaArray = ReadonlyArray<number>;
+
+// argb values inside range 0x00 to 0xff inclusive
+// int32ARGBColor = 0xaarrggbb
+export type int32ARGBColor = number;
+type NumberProp = string | number;
+type Color = int32ARGBColor | rgbaArray | string;
+type FillRule = 'evenodd' | 'nonzero';
+type Linecap = 'butt' | 'square' | 'round';
+type Linejoin = 'miter' | 'bevel' | 'round';
+type NumberArray = NumberProp[] | NumberProp;
 /*
 
   ColumnMajorTransformMatrix
@@ -17,7 +33,7 @@ import { XmlProps } from './xml';
   ╚═      ═╝
 
 */
-export type ColumnMajorTransformMatrix = [
+type ColumnMajorTransformMatrix = [
   number,
   number,
   number,
@@ -25,19 +41,25 @@ export type ColumnMajorTransformMatrix = [
   number,
   number,
 ];
-// rgba values inside range 0 to 1 inclusive
-// rgbaArray = [r, g, b, a]
-export type rgbaArray = ReadonlyArray<number>;
-
-// argb values inside range 0x00 to 0xff inclusive
-// int32ARGBColor = 0xaarrggbb
-export type int32ARGBColor = number;
-type NumberProp = string | number;
-type FillRule = 'evenodd' | 'nonzero';
-type Linecap = 'butt' | 'square' | 'round';
-type Linejoin = 'miter' | 'bevel' | 'round';
-type Color = int32ARGBColor | rgbaArray | string;
-type NumberArray = NumberProp[] | NumberProp;
+interface ClipProps {
+  clipRule?: FillRule;
+  clipPath?: string;
+}
+interface FillProps {
+  fill?: Color;
+  fillOpacity?: NumberProp;
+  fillRule?: FillRule;
+}
+interface StrokeProps {
+  stroke?: Color;
+  strokeWidth?: NumberProp;
+  strokeOpacity?: NumberProp;
+  strokeDasharray?: ReadonlyArray<NumberProp> | NumberProp;
+  strokeDashoffset?: NumberProp;
+  strokeLinecap?: Linecap;
+  strokeLinejoin?: Linejoin;
+  strokeMiterlimit?: NumberProp;
+}
 interface TransformObject {
   translate?: NumberArray;
   translateX?: NumberProp;
@@ -55,60 +77,74 @@ interface TransformObject {
   x?: NumberArray;
   y?: NumberArray;
 }
-type SvgXmlProps = XmlProps &
-  ViewProps & {
-    height: NumberProp;
-    width: NumberProp;
-    viewBox?: string;
-    preserveAspectRatio?: string;
-    color?: Color;
-    title?: string;
-    opacity?: NumberProp;
-    fill?: Color;
-    fillOpacity?: number;
-    fillRule?: FillRule;
-    stroke?: Color;
-    strokeWidth?: NumberProp;
-    strokeOpacity?: NumberProp;
-    strokeDasharray?: ReadonlyArray<NumberProp> | NumberProp;
-    strokeDashoffset?: NumberProp;
-    strokeLinecap?: Linecap;
-    strokeLinejoin?: Linejoin;
-    strokeMiterlimit?: NumberProp;
-    clipRule?: FillRule;
-    clipPath?: string;
-    transform?: ColumnMajorTransformMatrix | string | TransformObject;
-    translate?: NumberArray;
-    translateX?: NumberProp;
-    translateY?: NumberProp;
-    origin?: NumberArray;
-    originX?: NumberProp;
-    originY?: NumberProp;
-    scale?: NumberArray;
-    scaleX?: NumberProp;
-    scaleY?: NumberProp;
-    skew?: NumberArray;
-    skewX?: NumberProp;
-    skewY?: NumberProp;
-    rotation?: NumberProp;
-    x?: NumberArray;
-    y?: NumberArray;
-    vectorEffect?:
-      | 'none'
-      | 'non-scaling-stroke'
-      | 'nonScalingStroke'
-      | 'default'
-      | 'inherit'
-      | 'uri';
-    pointerEvents?: 'box-none' | 'none' | 'box-only' | 'auto';
-    id?: string;
-    marker?: string;
-    markerStart?: string;
-    markerMid?: string;
-    markerEnd?: string;
-    mask?: string;
-  };
-const SvgXml = React.forwardRef<HTMLOrSVGElement, SvgXmlProps>(
+interface TransformProps extends TransformObject {
+  transform?: ColumnMajorTransformMatrix | string | TransformObject;
+}
+interface ResponderProps extends GestureResponderHandlers {
+  pointerEvents?: 'box-none' | 'none' | 'box-only' | 'auto';
+}
+interface VectorEffectProps {
+  vectorEffect?:
+    | 'none'
+    | 'non-scaling-stroke'
+    | 'nonScalingStroke'
+    | 'default'
+    | 'inherit'
+    | 'uri';
+}
+
+interface TouchableProps {
+  disabled?: boolean;
+  onPress?: (event: GestureResponderEvent) => void;
+  onPressIn?: (event: GestureResponderEvent) => void;
+  onPressOut?: (event: GestureResponderEvent) => void;
+  onLongPress?: (event: GestureResponderEvent) => void;
+  delayPressIn?: number;
+  delayPressOut?: number;
+  delayLongPress?: number;
+}
+interface DefinitionProps {
+  id?: string;
+}
+
+interface CommonMarkerProps {
+  marker?: string;
+  markerStart?: string;
+  markerMid?: string;
+  markerEnd?: string;
+}
+
+interface CommonMaskProps {
+  mask?: string;
+}
+
+interface CommonPathProps
+  extends FillProps,
+    StrokeProps,
+    ClipProps,
+    TransformProps,
+    VectorEffectProps,
+    ResponderProps,
+    TouchableProps,
+    DefinitionProps,
+    CommonMarkerProps,
+    CommonMaskProps {}
+interface GProps extends CommonPathProps {
+  opacity?: NumberProp;
+}
+interface SvgProps extends GProps, ViewProps {
+  width?: NumberProp;
+  height?: NumberProp;
+  viewBox?: string;
+  preserveAspectRatio?: string;
+  color?: Color;
+  title?: string;
+}
+interface XmlProps extends SvgProps {
+  xml: string | null;
+  override?: SvgProps;
+}
+const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
   ({ xml, ...props }, fowardRef) => {
     const { attributes, innerSVG } = parseSVG(xml);
     const camelAttributes = kebabToCamel(attributes);
