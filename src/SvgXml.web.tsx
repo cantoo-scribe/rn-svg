@@ -224,8 +224,7 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
 
     // these props should override the xml props
     const overrideProps = {
-      height: '100%',
-      width: '100%',
+      style: { width: '100%', height: '100%' },
       transform: transformArr.length ? transformArr.join(' ') : transform,
       viewBox,
       preserveAspectRatio,
@@ -254,7 +253,10 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       mask,
     };
 
-    const finalProps = { ...camelAttributes, ...overrideProps };
+    const finalProps = {
+      ...camelAttributes,
+      ...removeUndefined(overrideProps),
+    };
     const Svg = unstable_createElement('svg', { ref: svgRef, ...finalProps });
 
     const containerDefaultStyles = {
@@ -289,15 +291,26 @@ function parseSVG(svg: string) {
   const content = svg.match(/<svg(.*)<\/svg>/ims)[1];
   const [, attrs, innerSVG] = content.match(/(.*?)>(.*)/ims);
   const attributes = [
-    ...matchAll(attrs)(/([a-z0-9]+)(=['"](.*?)['"])?[\s>]/gims),
+    ...matchAll(attrs)(/([a-z0-9]+)(=['"](.*?)['"])?/gims),
   ].map(([, key, , value]) => ({ [key]: value }));
   return { attributes, innerSVG };
 }
 
-function kebabToCamel(obj) {
+function kebabToCamel(attrs) {
   const camelObj = {};
-  Object.keys(obj).forEach(key => {
-    camelObj[key.replace(/-./g, x => x.toUpperCase()[1])] = obj[key];
+  attrs.forEach(attr => {
+    const key = Object.keys(attr)[0];
+    camelObj[key.replace(/-./g, x => x.toUpperCase()[1])] = attr[key];
   });
   return camelObj;
+}
+
+function removeUndefined(obj) {
+  const finalObj = {};
+  Object.keys(obj).forEach(key => {
+    if (obj[key] !== undefined) {
+      finalObj[key] = obj[key];
+    }
+  });
+  return finalObj;
 }
