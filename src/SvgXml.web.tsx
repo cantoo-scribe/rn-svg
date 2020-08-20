@@ -4,7 +4,8 @@ import {
   GestureResponderHandlers,
   GestureResponderEvent,
 } from 'react-native';
-import { View, unstable_createElement } from 'react-native-web';
+import { View, unstable_createElement as uce } from 'react-native-web';
+
 // rgba values inside range 0 to 1 inclusive
 // rgbaArray = [r, g, b, a]
 export type rgbaArray = ReadonlyArray<number>;
@@ -132,7 +133,7 @@ interface CommonPathProps
 interface GProps extends CommonPathProps {
   opacity?: NumberProp;
 }
-interface SvgProps extends GProps, ViewProps {
+export interface SvgProps extends GProps, ViewProps {
   width?: NumberProp;
   height?: NumberProp;
   viewBox?: string;
@@ -140,13 +141,15 @@ interface SvgProps extends GProps, ViewProps {
   color?: Color;
   title?: string;
 }
-interface XmlProps extends SvgProps {
+
+export interface XmlProps extends SvgProps {
   xml: string | null;
   override?: SvgProps;
 }
+
 const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
-  ({ xml, ...props }, fowardRef) => {
-    const { attributes, innerSVG } = parseSVG(xml);
+  ({ xml, ...props }: XmlProps, fowardRef) => {
+    const { attributes, innerSVG } = parseSVG(xml || '');
     const camelAttributes = kebabToCamel(attributes);
 
     const svgRef = React.createRef<SVGElement>();
@@ -162,7 +165,6 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       width,
       viewBox,
       preserveAspectRatio,
-      color,
       title,
       opacity,
       fill,
@@ -193,11 +195,12 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       rotation,
       skewX,
       skewY,
+      style,
       // props that should be applyed to the View container
       ...containerProps
     } = props;
 
-    const transformArr = [];
+    const transformArr: string[] = [];
 
     if (originX != null || originY != null) {
       transformArr.push(`translate(${originX || 0}, ${originY || 0})`);
@@ -219,7 +222,7 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       transformArr.push(`skewY(${skewY})`);
     }
     if (originX != null || originY != null) {
-      transformArr.push(`translate(${-originX || 0}, ${-originY || 0})`);
+      transformArr.push(`translate(${-(originX || 0)}, ${-(originY || 0)})`);
     }
 
     // these props should override the xml props
@@ -228,7 +231,6 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       transform: transformArr.length ? transformArr.join(' ') : transform,
       viewBox,
       preserveAspectRatio,
-      color,
       title,
       opacity,
       fill,
@@ -257,14 +259,25 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       ...camelAttributes,
       ...removeUndefined(overrideProps),
     };
-    const Svg = unstable_createElement('svg', { ref: svgRef, ...finalProps });
+    const Svg = uce('svg', { ref: svgRef, ...finalProps });
 
     const containerDefaultStyles = {
       width,
       height,
     };
+
+    const {
+      // native events that should be mapped to web events
+      onPress: onClick,
+      ...finalContainerProps
+    } = containerProps;
     return (
-      <View ref={fowardRef} {...containerProps} style={containerDefaultStyles}>
+      <View
+        ref={fowardRef}
+        {...finalContainerProps}
+        onClick={onClick}
+        style={[style, removeUndefined(containerDefaultStyles)]}
+      >
         {Svg}
       </View>
     );
@@ -276,8 +289,8 @@ SvgXml.displayName = 'Svg';
 export default SvgXml;
 
 /** polyfill for Node < 12 */
-function matchAll(str) {
-  return re => {
+function matchAll(str: string) {
+  return (re: RegExp) => {
     const matches = [];
     let groups;
     while ((groups = re.exec(str))) {
@@ -288,16 +301,21 @@ function matchAll(str) {
 }
 
 function parseSVG(svg: string) {
-  const content = svg.match(/<svg(.*)<\/svg>/ims)[1];
-  const [, attrs, innerSVG] = content.match(/(.*?)>(.*)/ims);
+  const contentMatch = svg.match(/<svg(.*)<\/svg>/ims);
+  const content = contentMatch ? contentMatch[1] : '';
+  const [, attrs, innerSVG] = content.match(/(.*?)>(.*)/ims) || ['', '', ''];
   const attributes = [
-    ...matchAll(attrs)(/([a-z0-9]+)(=['"](.*?)['"])?/gims),
+    ...matchAll(attrs)(/([a-z0-9-]+)(=['"](.*?)['"])?/gims),
   ].map(([, key, , value]) => ({ [key]: value }));
   return { attributes, innerSVG };
 }
 
-function kebabToCamel(attrs) {
-  const camelObj = {};
+interface ParsedProp {
+  [key: string]: unknown;
+}
+
+function kebabToCamel(attrs: ParsedProp[]) {
+  const camelObj: ParsedProp = {};
   attrs.forEach(attr => {
     const key = Object.keys(attr)[0];
     camelObj[key.replace(/-./g, x => x.toUpperCase()[1])] = attr[key];
@@ -305,8 +323,8 @@ function kebabToCamel(attrs) {
   return camelObj;
 }
 
-function removeUndefined(obj) {
-  const finalObj = {};
+function removeUndefined(obj: ParsedProp) {
+  const finalObj: ParsedProp = {};
   Object.keys(obj).forEach(key => {
     if (obj[key] !== undefined) {
       finalObj[key] = obj[key];
