@@ -1,11 +1,11 @@
 {
-  "version": "12.1.0",
-  "name": "react-native-svg",
+  "version": "1.0.0",
+  "name": "rn-svg",
   "description": "SVG library for react-native",
-  "homepage": "https://github.com/react-native-community/react-native-svg",
+  "homepage": "https://github.com/cantoo-scribe/rn-svg",
   "repository": {
     "type": "git",
-    "url": "https://github.com/react-native-community/react-native-svg"
+    "url": "https://github.com/cantoo-scribe/rn-svg"
   },
   "license": "MIT",
   "main": "lib/commonjs/index.js",
@@ -52,7 +52,8 @@
     "prepare": "npm run flowgen && npm run bob",
     "semantic-release": "semantic-release",
     "test": "npm run lint && npm run tsc && npm run flow && npm run jest",
-    "tsc": "tsc --noEmit"
+    "tsc": "tsc --noEmit",
+    "release": "release-it"
   },
   "peerDependencies": {
     "react": "*",
