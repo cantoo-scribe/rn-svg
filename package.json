@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "name": "rn-svg",
+  "name": "@cantoo/rn-svg",
   "description": "SVG library for react-native",
   "homepage": "https://github.com/cantoo-scribe/rn-svg",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cantoo-scribe/rn-svg"
+    "url": "git+https://github.com/cantoo-scribe/rn-svg.git"
   },
   "license": "MIT",
   "main": "lib/commonjs/index.js",
@@ -61,9 +61,11 @@
   },
   "dependencies": {
     "css-select": "^2.1.0",
-    "css-tree": "^1.0.0-alpha.39"
+    "css-tree": "^1.0.0-alpha.39",
+    "react-native-web": ">=0.13.4"
   },
   "devDependencies": {
+    "@babel/compat-data": "^7.9.0",
     "@react-native-community/bob": "^0.9.7",
     "@react-native-community/eslint-config": "0.0.7",
     "@react-native-community/eslint-plugin": "^1.0.0",
@@ -108,5 +110,12 @@
   "nativePackage": true,
   "optionalDependencies": {
     "react-native-web": ">=0.13.4"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/cantoo-scribe/rn-svg/issues"
+  },
+  "directories": {
+    "lib": "lib"
+  },
+  "author": "sharcoux"
 }
