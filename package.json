@@ -87,6 +87,7 @@
     "react": "^16.13.0",
     "react-native": "^0.61.5",
     "react-test-renderer": "^16.13.0",
+    "release-it": "^13.6.8",
     "semantic-release": "^17.0.4",
     "semantic-release-cli": "^5.2.3",
     "typescript": "^3.8.3"
