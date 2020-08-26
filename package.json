@@ -7,7 +7,6 @@
     "type": "git",
     "url": "git+https://github.com/cantoo-scribe/rn-svg.git"
   },
-  "private": false,
   "license": "MIT",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
@@ -108,10 +107,8 @@
       "@semantic-release/git"
     ]
   },
-  "release-it": {
-    "publishConfig": {
-      "access": "public"
-    }
+  "publishConfig": {
+    "access": "public"
   },
   "nativePackage": true,
   "optionalDependencies": {
