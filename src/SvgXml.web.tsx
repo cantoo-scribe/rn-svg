@@ -343,8 +343,8 @@ function removeUndefined(obj: ParsedProp) {
 
 function parseDimension(dim: string) {
   // if dim has only numeric values
-  if (/^\d+$/.test(dim)) {
-    return parseInt(dim, 10);
+  if (/^(\d|\.)+$/.test(dim)) {
+    return parseFloat(dim);
   }
   return dim;
 }
