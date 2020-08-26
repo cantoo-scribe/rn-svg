@@ -107,6 +107,11 @@
       "@semantic-release/git"
     ]
   },
+  "release-it": {
+    "publishConfig": {
+      "access": "public"
+    }
+  },
   "nativePackage": true,
   "optionalDependencies": {
     "react-native-web": ">=0.13.4"
