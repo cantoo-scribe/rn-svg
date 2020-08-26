@@ -260,10 +260,18 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       ...removeUndefined(overrideProps),
     };
     const Svg = uce('svg', { ref: svgRef, ...finalProps });
-
+    /**
+     * If the width/height props aren't declared as props, we should apply the width/height from svg xml
+     */
     const containerDefaultStyles = {
-      width,
-      height,
+      width:
+        width !== undefined
+          ? width
+          : parseDimension(camelAttributes.width as string),
+      height:
+        height !== undefined
+          ? height
+          : parseDimension(camelAttributes.height as string),
     };
 
     const {
@@ -331,4 +339,12 @@ function removeUndefined(obj: ParsedProp) {
     }
   });
   return finalObj;
+}
+
+function parseDimension(dim: string) {
+  // if dim has only numeric values
+  if (/^\d+$/.test(dim)) {
+    return parseInt(dim, 10);
+  }
+  return dim;
 }
