@@ -57,12 +57,12 @@
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": ">=0.50.0"
+    "react-native": ">=0.50.0",
+    "react-native-web": ">=0.13.4"
   },
   "dependencies": {
     "css-select": "^2.1.0",
     "css-tree": "^1.0.0-alpha.39",
-    "react-native-web": ">=0.13.4"
   },
   "devDependencies": {
     "@babel/compat-data": "^7.9.0",
@@ -88,6 +88,7 @@
     "prettier": "^1.19.1",
     "react": "^16.13.0",
     "react-native": "^0.61.5",
+    "react-native-web": ">=0.13.4",
     "react-test-renderer": "^16.13.0",
     "release-it": "^13.6.8",
     "semantic-release": "^17.0.4",
