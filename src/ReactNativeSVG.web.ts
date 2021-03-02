@@ -94,6 +94,7 @@ const prepare = <T extends BaseProps>(
     onPressIn,
     onPressOut,
     onLongPress,
+    transform = [],
     // @ts-ignore
     ...rest
   } = props;
@@ -125,8 +126,6 @@ const prepare = <T extends BaseProps>(
     ...rest,
   };
 
-  const transform = [];
-
   if (originX != null || originY != null) {
     transform.push(`translate(${originX || 0}, ${originY || 0})`);
   }
@@ -151,6 +150,7 @@ const prepare = <T extends BaseProps>(
   }
 
   if (transform.length) {
+    if(clean.transform) transform.push(clean.transform)
     clean.transform = transform.join(' ');
   }
 
