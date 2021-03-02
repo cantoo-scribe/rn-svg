@@ -94,7 +94,6 @@ const prepare = <T extends BaseProps>(
     onPressIn,
     onPressOut,
     onLongPress,
-    transform = [],
     // @ts-ignore
     ...rest
   } = props;
@@ -125,6 +124,8 @@ const prepare = <T extends BaseProps>(
       : null),
     ...rest,
   };
+
+  const transform = [];
 
   if (originX != null || originY != null) {
     transform.push(`translate(${originX || 0}, ${originY || 0})`);
