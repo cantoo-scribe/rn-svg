@@ -151,7 +151,7 @@ const prepare = <T extends BaseProps>(
   }
 
   if (transform.length) {
-    if(clean.transform) transform.push(clean.transform)
+    if(clean.transform) transform.unshift(clean.transform)
     clean.transform = transform.join(' ');
   }
 
