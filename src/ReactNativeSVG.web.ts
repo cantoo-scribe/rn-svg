@@ -3,15 +3,14 @@ import * as React from 'react';
 import {
   GestureResponderEvent,
   // @ts-ignore
-  unstable_createElement as ucE,
-  // @ts-ignore
-  createElement as cE,
+  unstable_createElement as createElement,
 } from 'react-native';
 import { NumberArray, NumberProp } from './lib/extract/types';
 import SvgTouchableMixin from './lib/SvgTouchableMixin';
 import { resolve } from './lib/resolve';
-
-const createElement = cE || ucE;
+export { default as SvgXml } from './SvgXml.web';
+export { default as SvgCss } from './SvgXml.web';
+export { default as SvgUri } from './SvgUri.web';
 
 type BlurEvent = Object;
 type FocusEvent = Object;
@@ -122,7 +121,7 @@ const prepare = <T extends BaseProps>(
     ...rest,
   };
 
-  const transform = [];
+  const transform: String[] = [];
 
   if (originX != null || originY != null) {
     transform.push(`translate(${originX || 0}, ${originY || 0})`);
@@ -148,6 +147,9 @@ const prepare = <T extends BaseProps>(
   }
 
   if (transform.length) {
+    if (clean.transform) {
+      transform.unshift(clean.transform);
+    }
     clean.transform = transform.join(' ');
   }
 
@@ -209,7 +211,11 @@ const measureLayout = (
     setTimeout(() => {
       // @ts-ignore
       const relativeRect = getBoundingClientRect(relativeNode);
-      const { height, left, top, width } = getBoundingClientRect(node);
+      const nodeRect = getBoundingClientRect(node);
+      if (!nodeRect || !relativeRect) {
+        return;
+      }
+      const { height, left, top, width } = nodeRect;
       const x = left - relativeRect.left;
       const y = top - relativeRect.top;
       callback(x, y, width, height, left, top);
@@ -229,7 +235,7 @@ function remeasure() {
 
 export class WebShape<
   P extends BaseProps = BaseProps,
-  C = {}
+  C = {},
 > extends React.Component<P, C> {
   [x: string]: unknown;
   _remeasureMetricsOnActivation: () => void;
