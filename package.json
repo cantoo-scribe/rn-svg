@@ -2,10 +2,10 @@
   "version": "12.2.0",
   "name": "react-native-svg",
   "description": "SVG library for react-native",
-  "homepage": "https://github.com/react-native-community/react-native-svg",
+  "homepage": "https://github.com/cantoo-scribe/rn-svg",
   "repository": {
     "type": "git",
-    "url": "https://github.com/react-native-community/react-native-svg"
+    "url": "git+https://github.com/cantoo-scribe/rn-svg.git"
   },
   "license": "MIT",
   "main": "lib/commonjs/index.js",
@@ -52,17 +52,20 @@
     "prepare": "npm run flowgen && npm run bob",
     "semantic-release": "semantic-release",
     "test": "npm run lint && npm run tsc && npm run flow && npm run jest",
-    "tsc": "tsc --noEmit"
+    "tsc": "tsc --noEmit",
+    "release": "release-it"
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": ">=0.50.0"
+    "react-native": ">=0.50.0",
+    "react-native-web": ">=0.13.4"
   },
   "dependencies": {
     "css-select": "^2.1.0",
     "css-tree": "^1.0.0-alpha.39"
   },
   "devDependencies": {
+    "@babel/compat-data": "^7.9.0",
     "@react-native-community/bob": "^0.9.7",
     "@react-native-community/eslint-config": "0.0.7",
     "@react-native-community/eslint-plugin": "^1.0.0",
@@ -85,7 +88,9 @@
     "prettier": "^1.19.1",
     "react": "^16.13.0",
     "react-native": "^0.61.5",
+    "react-native-web": ">=0.13.4",
     "react-test-renderer": "^16.13.0",
+    "release-it": "^13.6.8",
     "semantic-release": "^17.0.4",
     "semantic-release-cli": "^5.2.3",
     "typescript": "^3.8.3"
@@ -103,5 +108,18 @@
       "@semantic-release/git"
     ]
   },
-  "nativePackage": true
+  "publishConfig": {
+    "access": "public"
+  },
+  "nativePackage": true,
+  "optionalDependencies": {
+    "react-native-web": ">=0.13.4"
+  },
+  "bugs": {
+    "url": "https://github.com/cantoo-scribe/rn-svg/issues"
+  },
+  "directories": {
+    "lib": "lib"
+  },
+  "author": "sharcoux"
 }
