@@ -1,6 +1,6 @@
 {
   "version": "12.3.0",
-  "name": "@cantoo-scribe/rn-svg",
+  "name": "@cantoo/rn-svg",
   "description": "SVG library for react-native",
   "homepage": "https://github.com/cantoo-scribe/rn-svg",
   "repository": {
