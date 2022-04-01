@@ -236,12 +236,21 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
 
     const svgStyle = React.useMemo(() => {
       const [, , widthBox, heightBox] = (viewBox || '').split(' ');
-      const { width: styleWidth, height: styleHeight } = StyleSheet.flatten(
-        style,
-      );
+      const {
+        width: styleWidth,
+        height: styleHeight,
+        minHeight,
+        minWidth,
+        maxHeight,
+        maxWidth,
+      } = StyleSheet.flatten(style);
       return {
         width: width || styleWidth || svgAttributes.width || widthBox,
         height: height || styleHeight || svgAttributes.height || heightBox,
+        minHeight,
+        minWidth,
+        maxHeight,
+        maxWidth,
       };
     }, [
       svgAttributes.height,
@@ -251,6 +260,18 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       viewBox,
       width,
     ]);
+
+    const containerStyle = React.useMemo(() => {
+      const propStyle = StyleSheet.flatten(style);
+      delete propStyle.width;
+      delete propStyle.height;
+      delete propStyle.minWidth;
+      delete propStyle.minHeight;
+      delete propStyle.maxWidth;
+      delete propStyle.maxHeight;
+      propStyle.display = 'inline-flex' as 'flex';
+      return propStyle;
+    }, [style]);
 
     // these props should override the xml props
     const overrideProps = React.useMemo(
@@ -327,7 +348,7 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
         ref={fowardRef}
         {...finalContainerProps}
         onClick={onClick}
-        style={style}
+        style={containerStyle}
       >
         {Svg}
       </Text>
