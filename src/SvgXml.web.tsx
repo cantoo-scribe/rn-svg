@@ -4,6 +4,7 @@ import {
   GestureResponderHandlers,
   GestureResponderEvent,
   StyleSheet,
+  TextStyle,
 } from 'react-native';
 import { Text, unstable_createElement as uce } from 'react-native-web';
 
@@ -262,7 +263,7 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
     ]);
 
     const containerStyle = React.useMemo(() => {
-      const propStyle = StyleSheet.flatten(style);
+      const propStyle = StyleSheet.flatten(style) as TextStyle;
       delete propStyle.width;
       delete propStyle.height;
       delete propStyle.minWidth;
@@ -270,6 +271,7 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       delete propStyle.maxWidth;
       delete propStyle.maxHeight;
       propStyle.display = 'inline-flex' as 'flex';
+      propStyle.color = 'inherit';
       return propStyle;
     }, [style]);
 
