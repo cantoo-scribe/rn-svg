@@ -231,11 +231,11 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       if (transform) {
         transformArray.push(transform as string);
       }
-      return transformArray.join(' ');
+      return transformArray.length ? transformArray.join(' ') : undefined;
     }, [originX, originY, rotation, scale, skewX, skewY, transform, translate]);
 
     const svgStyle = React.useMemo(() => {
-      const [, , widthBox, heightBox] = viewBox.split(' ');
+      const [, , widthBox, heightBox] = (viewBox || '').split(' ');
       const { width: styleWidth, height: styleHeight } = StyleSheet.flatten(
         style,
       );
