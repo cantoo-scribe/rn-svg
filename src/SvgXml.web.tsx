@@ -3,6 +3,7 @@ import {
   ViewProps,
   GestureResponderHandlers,
   GestureResponderEvent,
+  StyleSheet,
 } from 'react-native';
 import { Text, unstable_createElement as uce } from 'react-native-web';
 
@@ -149,16 +150,18 @@ export interface XmlProps extends SvgProps {
 
 const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
   ({ xml, ...props }: XmlProps, fowardRef) => {
-    const { attributes, innerSVG } = parseSVG(xml || '');
-    const camelAttributes = kebabToCamel(attributes);
+    const { innerSVG, svgAttributes } = React.useMemo(() => {
+      const { attributes, innerHTML } = parseSVG(xml || '');
+      return { innerSVG: innerHTML, svgAttributes: kebabToCamel(attributes) };
+    }, [xml]);
 
-    const svgRef = React.createRef<SVGElement>();
+    const svgRef = React.useRef<SVGElement>(null);
     React.useLayoutEffect(() => {
       if (!svgRef.current) {
         return;
       }
       svgRef.current.innerHTML = innerSVG;
-    }, [innerSVG, svgRef]);
+    }, [innerSVG]);
 
     const {
       height,
@@ -199,79 +202,119 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       ...containerProps
     } = props;
 
-    const transformArr: string[] = [];
+    const svgTransform = React.useMemo<string>(() => {
+      const transformArray: string[] = [];
+      if (originX != null || originY != null) {
+        transformArray.push(`translate(${originX || 0}, ${originY || 0})`);
+      }
+      if (translate != null) {
+        transformArray.push(`translate(${translate})`);
+      }
+      if (scale != null) {
+        transformArray.push(`scale(${scale})`);
+      }
+      // rotation maps to rotate, not to collide with the text rotate attribute (which acts per glyph rather than block)
+      if (rotation != null) {
+        transformArray.push(`rotate(${rotation})`);
+      }
+      if (skewX != null) {
+        transformArray.push(`skewX(${skewX})`);
+      }
+      if (skewY != null) {
+        transformArray.push(`skewY(${skewY})`);
+      }
+      if (originX != null || originY != null) {
+        transformArray.push(
+          `translate(${-(originX || 0)}, ${-(originY || 0)})`,
+        );
+      }
+      if (transform) {
+        transformArray.push(transform as string);
+      }
+      return transformArray.join(' ');
+    }, [originX, originY, rotation, scale, skewX, skewY, transform, translate]);
 
-    if (originX != null || originY != null) {
-      transformArr.push(`translate(${originX || 0}, ${originY || 0})`);
-    }
-    if (translate != null) {
-      transformArr.push(`translate(${translate})`);
-    }
-    if (scale != null) {
-      transformArr.push(`scale(${scale})`);
-    }
-    // rotation maps to rotate, not to collide with the text rotate attribute (which acts per glyph rather than block)
-    if (rotation != null) {
-      transformArr.push(`rotate(${rotation})`);
-    }
-    if (skewX != null) {
-      transformArr.push(`skewX(${skewX})`);
-    }
-    if (skewY != null) {
-      transformArr.push(`skewY(${skewY})`);
-    }
-    if (originX != null || originY != null) {
-      transformArr.push(`translate(${-(originX || 0)}, ${-(originY || 0)})`);
-    }
+    const svgStyle = React.useMemo(() => {
+      const [, , widthBox, heightBox] = viewBox.split(' ');
+      const { width: styleWidth, height: styleHeight } = StyleSheet.flatten(
+        style,
+      );
+      return {
+        width: width || styleWidth || svgAttributes.width || widthBox,
+        height: height || styleHeight || svgAttributes.height || heightBox,
+      };
+    }, [
+      svgAttributes.height,
+      svgAttributes.width,
+      height,
+      style,
+      viewBox,
+      width,
+    ]);
 
     // these props should override the xml props
-    const overrideProps = {
-      style: { width: '100%', height: '100%' },
-      transform: transformArr.length ? transformArr.join(' ') : transform,
-      viewBox,
-      preserveAspectRatio,
-      title,
-      opacity,
-      fill,
-      fillOpacity,
-      fillRule,
-      stroke,
-      strokeWidth,
-      strokeOpacity,
-      strokeDasharray,
-      strokeDashoffset,
-      strokeLinecap,
-      strokeLinejoin,
-      strokeMiterlimit,
-      clipRule,
-      clipPath,
-      vectorEffect,
-      pointerEvents: 'none',
-      id,
-      markerStart,
-      markerMid,
-      markerEnd,
-      mask,
-    };
+    const overrideProps = React.useMemo(
+      () =>
+        removeUndefined({
+          ...svgAttributes,
+          style: svgStyle,
+          transform: svgTransform,
+          viewBox,
+          preserveAspectRatio,
+          title,
+          opacity,
+          fill,
+          fillOpacity,
+          fillRule,
+          stroke,
+          strokeWidth,
+          strokeOpacity,
+          strokeDasharray,
+          strokeDashoffset,
+          strokeLinecap,
+          strokeLinejoin,
+          strokeMiterlimit,
+          clipRule,
+          clipPath,
+          vectorEffect,
+          pointerEvents: 'none',
+          id,
+          markerStart,
+          markerMid,
+          markerEnd,
+          mask,
+        }),
+      [
+        svgAttributes,
+        clipPath,
+        clipRule,
+        fill,
+        fillOpacity,
+        fillRule,
+        id,
+        markerEnd,
+        markerMid,
+        markerStart,
+        mask,
+        opacity,
+        preserveAspectRatio,
+        stroke,
+        strokeDasharray,
+        strokeDashoffset,
+        strokeLinecap,
+        strokeLinejoin,
+        strokeMiterlimit,
+        strokeOpacity,
+        strokeWidth,
+        svgStyle,
+        svgTransform,
+        title,
+        vectorEffect,
+        viewBox,
+      ],
+    );
 
-    const finalProps = {
-      ...camelAttributes,
-      ...removeUndefined(overrideProps),
-    };
-    const Svg = uce('svg', { ref: svgRef, ...finalProps });
-    /**
-     * If the width/height props aren't declared as props, we should apply the width/height from svg xml
-     */
-    const containerDefaultStyles = {
-      width:
-        width !== undefined
-          ? width
-          : parseDimension(camelAttributes.width as string),
-      height:
-        height !== undefined
-          ? height
-          : parseDimension(camelAttributes.height as string),
-    };
+    const Svg = uce('svg', { ref: svgRef, ...overrideProps });
 
     const {
       // native events that should be mapped to web events
@@ -283,7 +326,7 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
         ref={fowardRef}
         {...finalContainerProps}
         onClick={onClick}
-        style={[style, removeUndefined(containerDefaultStyles)]}
+        style={style}
       >
         {Svg}
       </Text>
@@ -310,11 +353,11 @@ function matchAll(str: string) {
 function parseSVG(svg: string) {
   const contentMatch = svg.match(/<svg(.*)<\/svg>/ims);
   const content = contentMatch ? contentMatch[1] : '';
-  const [, attrs, innerSVG] = content.match(/(.*?)>(.*)/ims) || ['', '', ''];
+  const [, attrs, innerHTML] = content.match(/(.*?)>(.*)/ims) || ['', '', ''];
   const attributes = [
     ...matchAll(attrs)(/([a-z0-9-]+)(=['"](.*?)['"])?/gims),
   ].map(([, key, , value]) => ({ [key]: value }));
-  return { attributes, innerSVG };
+  return { attributes, innerHTML };
 }
 
 interface ParsedProp {
@@ -338,12 +381,4 @@ function removeUndefined(obj: ParsedProp) {
     }
   });
   return finalObj;
-}
-
-function parseDimension(dim: string) {
-  // if dim has only numeric values
-  if (/^(\d|\.)+$/.test(dim)) {
-    return parseFloat(dim);
-  }
-  return dim;
 }
