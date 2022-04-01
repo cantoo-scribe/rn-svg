@@ -4,7 +4,7 @@ import {
   GestureResponderHandlers,
   GestureResponderEvent,
 } from 'react-native';
-import { View, unstable_createElement as uce } from 'react-native-web';
+import { Text, unstable_createElement as uce } from 'react-native-web';
 
 // rgba values inside range 0 to 1 inclusive
 // rgbaArray = [r, g, b, a]
@@ -279,14 +279,14 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       ...finalContainerProps
     } = containerProps;
     return (
-      <View
+      <Text
         ref={fowardRef}
         {...finalContainerProps}
         onClick={onClick}
         style={[style, removeUndefined(containerDefaultStyles)]}
       >
         {Svg}
-      </View>
+      </Text>
     );
   },
 );
