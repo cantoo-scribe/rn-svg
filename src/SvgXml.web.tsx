@@ -254,9 +254,9 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
 
     // these props should override the xml props
     const overrideProps = React.useMemo(
-      () =>
-        removeUndefined({
-          ...svgAttributes,
+      () => ({
+        ...removeUndefined(svgAttributes),
+        ...removeUndefined({
           style: svgStyle,
           transform: svgTransform,
           viewBox,
@@ -284,6 +284,7 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
           markerEnd,
           mask,
         }),
+      }),
       [
         svgAttributes,
         clipPath,
