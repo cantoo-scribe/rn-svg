@@ -6,7 +6,13 @@ import {
   StyleSheet,
   TextStyle,
 } from 'react-native';
-import { Text, unstable_createElement as uce } from 'react-native-web';
+import { unstable_createElement as uce } from 'react-native-web';
+import useElementLayout from 'react-native-web/dist/modules/useElementLayout';
+import usePlatformMethods from 'react-native-web/dist/modules/usePlatformMethods';
+import useResponderEvents from 'react-native-web/dist/modules/useResponderEvents';
+import useMergeRefs from 'react-native-web/dist/modules/useMergeRefs';
+import pick from 'react-native-web/dist/modules/pick';
+import * as forwardedProps from 'react-native-web/dist/modules/forwardedProps';
 
 // rgba values inside range 0 to 1 inclusive
 // rgbaArray = [r, g, b, a]
@@ -148,6 +154,24 @@ export interface XmlProps extends SvgProps {
   xml: string | null;
   override?: SvgProps;
 }
+
+const forwardPropsList = {
+  ...forwardedProps.defaultProps,
+  ...forwardedProps.accessibilityProps,
+  ...forwardedProps.clickProps,
+  ...forwardedProps.focusProps,
+  ...forwardedProps.keyboardProps,
+  ...forwardedProps.mouseProps,
+  ...forwardedProps.touchProps,
+  ...forwardedProps.styleProps,
+  href: true,
+  lang: true,
+  onScroll: true,
+  onWheel: true,
+  pointerEvents: true,
+};
+
+const pickProps = props => pick(props, forwardPropsList);
 
 const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
   ({ xml, ...props }: XmlProps, fowardRef) => {
@@ -343,18 +367,50 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
     const {
       // native events that should be mapped to web events
       onPress: onClick,
+      onLayout,
+      onMoveShouldSetResponder,
+      onMoveShouldSetResponderCapture,
+      onResponderEnd,
+      onResponderGrant,
+      onResponderMove,
+      onResponderReject,
+      onResponderRelease,
+      onResponderStart,
+      onResponderTerminate,
+      onResponderTerminationRequest,
+      onStartShouldSetResponder,
+      onStartShouldSetResponderCapture,
       ...finalContainerProps
     } = containerProps;
-    return (
-      <Text
-        ref={fowardRef}
-        {...finalContainerProps}
-        onClick={onClick}
-        style={containerStyle}
-      >
-        {Svg}
-      </Text>
-    );
+
+    useElementLayout(fowardRef, onLayout);
+    const supportedContainerProps = pickProps(finalContainerProps);
+    // change this line to set a default style for the container
+    const classList = [StyleSheet.create({ default: {} }).default];
+    supportedContainerProps.classList = classList;
+    const platformMethodsRef = usePlatformMethods({ classList, style });
+    useResponderEvents(fowardRef, {
+      onMoveShouldSetResponder,
+      onMoveShouldSetResponderCapture,
+      onResponderEnd,
+      onResponderGrant,
+      onResponderMove,
+      onResponderReject,
+      onResponderRelease,
+      onResponderStart,
+      onResponderTerminate,
+      onResponderTerminationRequest,
+      onStartShouldSetResponder,
+      onStartShouldSetResponderCapture,
+    });
+    const setRef = useMergeRefs(fowardRef, platformMethodsRef);
+    const Container = uce('span', {
+      ref: setRef,
+      onClick,
+      style: containerStyle,
+      ...supportedContainerProps,
+    });
+    return <Container>{Svg}</Container>;
   },
 );
 
