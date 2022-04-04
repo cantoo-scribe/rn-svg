@@ -1,7 +1,10 @@
 {
   "compilerOptions": {
     "target": "es2017",
-    "lib": ["es6", "es2016"],
+    "lib": [
+      "es6",
+      "es2016"
+    ],
     "jsx": "react-native",
     "strict": true,
     "noImplicitAny": true,
@@ -17,10 +20,15 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "types": ["react", "react-native"]
+    "types": [
+      "react",
+      "react-native"
+    ],
   },
   "files": [
-    "src/index.d.ts"
+    "index.d.ts"
   ],
-  "include": ["src/index.ts"]
+  "include": [
+    "src/index.ts"
+  ]
 }
