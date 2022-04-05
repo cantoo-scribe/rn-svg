@@ -3,9 +3,7 @@ import * as React from 'react';
 import {
   GestureResponderEvent,
   // @ts-ignore
-  unstable_createElement as ucE,
-  // @ts-ignore
-  createElement as cE,
+  unstable_createElement as createElement,
 } from 'react-native';
 import { NumberArray, NumberProp } from './lib/extract/types';
 import SvgTouchableMixin from './lib/SvgTouchableMixin';
@@ -13,8 +11,6 @@ import { resolve } from './lib/resolve';
 export { default as SvgXml } from './SvgXml.web';
 export { default as SvgCss } from './SvgXml.web';
 export { default as SvgUri } from './SvgUri.web';
-
-const createElement = cE || ucE;
 
 type BlurEvent = Object;
 type FocusEvent = Object;
@@ -112,15 +108,15 @@ const prepare = <T extends BaseProps>(
   } = {
     ...(hasTouchableProperty
       ? {
-          onStartShouldSetResponder:
-            self.touchableHandleStartShouldSetResponder,
-          onResponderTerminationRequest:
-            self.touchableHandleResponderTerminationRequest,
-          onResponderGrant: self.touchableHandleResponderGrant,
-          onResponderMove: self.touchableHandleResponderMove,
-          onResponderRelease: self.touchableHandleResponderRelease,
-          onResponderTerminate: self.touchableHandleResponderTerminate,
-        }
+        onStartShouldSetResponder:
+          self.touchableHandleStartShouldSetResponder,
+        onResponderTerminationRequest:
+          self.touchableHandleResponderTerminationRequest,
+        onResponderGrant: self.touchableHandleResponderGrant,
+        onResponderMove: self.touchableHandleResponderMove,
+        onResponderRelease: self.touchableHandleResponderRelease,
+        onResponderTerminate: self.touchableHandleResponderTerminate,
+      }
       : null),
     ...rest,
   };
@@ -236,7 +232,7 @@ function remeasure() {
 export class WebShape<
   P extends BaseProps = BaseProps,
   C = {}
-> extends React.Component<P, C> {
+  > extends React.Component<P, C> {
   [x: string]: unknown;
   _remeasureMetricsOnActivation: () => void;
   touchableHandleStartShouldSetResponder?: (

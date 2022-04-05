@@ -4,7 +4,6 @@ import {
   GestureResponderHandlers,
   GestureResponderEvent,
   StyleSheet,
-  TextStyle,
 } from 'react-native';
 import { unstable_createElement as uce } from 'react-native-web';
 import useElementLayout from 'react-native-web/dist/modules/useElementLayout';
@@ -403,12 +402,13 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
     )
     useResponderEvents(hostRef, responderConfig)
 
-    const platformMethodsRef = usePlatformMethods({ ...finalContainerProps, classList, style })
+    const platformMethodsRef = usePlatformMethods({ ...finalContainerProps, classList, containerStyle })
 
     const setRef = useMergeRefs(hostRef, platformMethodsRef, forwardedRef)
 
     return uce('span', {
       ...finalContainerProps,
+      classList,
       ref: setRef,
       style: containerStyle,
     }, Svg);
