@@ -94,12 +94,12 @@ interface ResponderProps extends GestureResponderHandlers {
 }
 interface VectorEffectProps {
   vectorEffect?:
-    | 'none'
-    | 'non-scaling-stroke'
-    | 'nonScalingStroke'
-    | 'default'
-    | 'inherit'
-    | 'uri';
+  | 'none'
+  | 'non-scaling-stroke'
+  | 'nonScalingStroke'
+  | 'default'
+  | 'inherit'
+  | 'uri';
 }
 
 interface TouchableProps {
@@ -129,15 +129,15 @@ interface CommonMaskProps {
 
 interface CommonPathProps
   extends FillProps,
-    StrokeProps,
-    ClipProps,
-    TransformProps,
-    VectorEffectProps,
-    ResponderProps,
-    TouchableProps,
-    DefinitionProps,
-    CommonMarkerProps,
-    CommonMaskProps {}
+  StrokeProps,
+  ClipProps,
+  TransformProps,
+  VectorEffectProps,
+  ResponderProps,
+  TouchableProps,
+  DefinitionProps,
+  CommonMarkerProps,
+  CommonMaskProps { }
 interface GProps extends CommonPathProps {
   opacity?: NumberProp;
 }
@@ -170,6 +170,8 @@ const forwardPropsList = {
   onWheel: true,
   pointerEvents: true,
 };
+
+const classList = [];
 
 const pickProps = props => pick(props, forwardPropsList);
 
@@ -386,10 +388,10 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
     useElementLayout(fowardRef, onLayout);
     const supportedContainerProps = pickProps(finalContainerProps);
     // change this line to set a default style for the container
-    const classList = [StyleSheet.create({ default: {} }).default];
     supportedContainerProps.classList = classList;
     const platformMethodsRef = usePlatformMethods({ classList, style });
-    useResponderEvents(fowardRef, {
+
+    const responderProps = React.useMemo(() => ({
       onMoveShouldSetResponder,
       onMoveShouldSetResponderCapture,
       onResponderEnd,
@@ -402,7 +404,21 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       onResponderTerminationRequest,
       onStartShouldSetResponder,
       onStartShouldSetResponderCapture,
-    });
+    }), [
+      onMoveShouldSetResponder,
+      onMoveShouldSetResponderCapture,
+      onResponderEnd,
+      onResponderGrant,
+      onResponderMove,
+      onResponderReject,
+      onResponderRelease,
+      onResponderStart,
+      onResponderTerminate,
+      onResponderTerminationRequest,
+      onStartShouldSetResponder,
+      onStartShouldSetResponderCapture,
+    ]);
+    useResponderEvents(fowardRef, responderProps);
     const setRef = useMergeRefs(fowardRef, platformMethodsRef);
     const Container = uce('span', {
       ref: setRef,
