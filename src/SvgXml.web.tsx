@@ -11,8 +11,6 @@ import useElementLayout from 'react-native-web/dist/modules/useElementLayout';
 import usePlatformMethods from 'react-native-web/dist/modules/usePlatformMethods';
 import useResponderEvents from 'react-native-web/dist/modules/useResponderEvents';
 import useMergeRefs from 'react-native-web/dist/modules/useMergeRefs';
-import pick from 'react-native-web/dist/modules/pick';
-import * as forwardedProps from 'react-native-web/dist/modules/forwardedProps';
 
 // rgba values inside range 0 to 1 inclusive
 // rgbaArray = [r, g, b, a]
@@ -155,28 +153,8 @@ export interface XmlProps extends SvgProps {
   override?: SvgProps;
 }
 
-const forwardPropsList = {
-  ...forwardedProps.defaultProps,
-  ...forwardedProps.accessibilityProps,
-  ...forwardedProps.clickProps,
-  ...forwardedProps.focusProps,
-  ...forwardedProps.keyboardProps,
-  ...forwardedProps.mouseProps,
-  ...forwardedProps.touchProps,
-  ...forwardedProps.styleProps,
-  href: true,
-  lang: true,
-  onScroll: true,
-  onWheel: true,
-  pointerEvents: true,
-};
-
-const classList = [];
-
-const pickProps = props => pick(props, forwardPropsList);
-
 const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
-  ({ xml, ...props }: XmlProps, fowardRef) => {
+  ({ xml, ...props }: XmlProps, forwardedRef) => {
     const { innerSVG, svgAttributes } = React.useMemo(() => {
       const { attributes, innerHTML } = parseSVG(xml || '');
       return { innerSVG: innerHTML, svgAttributes: kebabToCamel(attributes) };
@@ -367,8 +345,6 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
     const Svg = uce('svg', { ref: svgRef, ...overrideProps });
 
     const {
-      // native events that should be mapped to web events
-      onPress: onClick,
       onLayout,
       onMoveShouldSetResponder,
       onMoveShouldSetResponderCapture,
@@ -382,51 +358,52 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       onResponderTerminationRequest,
       onStartShouldSetResponder,
       onStartShouldSetResponderCapture,
-      ...finalContainerProps
-    } = containerProps;
+      ...finalProps
+    } = containerProps
 
-    useElementLayout(fowardRef, onLayout);
-    const supportedContainerProps = pickProps(finalContainerProps);
-    // change this line to set a default style for the container
-    supportedContainerProps.classList = classList;
-    const platformMethodsRef = usePlatformMethods({ classList, style });
+    const hostRef = React.useRef<HTMLDivElement>(null)
+    useElementLayout(hostRef, onLayout)
+    const responderConfig = React.useMemo(
+      () => ({
+        onMoveShouldSetResponder,
+        onMoveShouldSetResponderCapture,
+        onResponderEnd,
+        onResponderGrant,
+        onResponderMove,
+        onResponderReject,
+        onResponderRelease,
+        onResponderStart,
+        onResponderTerminate,
+        onResponderTerminationRequest,
+        onStartShouldSetResponder,
+        onStartShouldSetResponderCapture,
+      }),
+      [
+        onMoveShouldSetResponder,
+        onMoveShouldSetResponderCapture,
+        onResponderEnd,
+        onResponderGrant,
+        onResponderMove,
+        onResponderReject,
+        onResponderRelease,
+        onResponderStart,
+        onResponderTerminate,
+        onResponderTerminationRequest,
+        onStartShouldSetResponder,
+        onStartShouldSetResponderCapture,
+      ]
+    )
+    useResponderEvents(hostRef, responderConfig)
 
-    const responderProps = React.useMemo(() => ({
-      onMoveShouldSetResponder,
-      onMoveShouldSetResponderCapture,
-      onResponderEnd,
-      onResponderGrant,
-      onResponderMove,
-      onResponderReject,
-      onResponderRelease,
-      onResponderStart,
-      onResponderTerminate,
-      onResponderTerminationRequest,
-      onStartShouldSetResponder,
-      onStartShouldSetResponderCapture,
-    }), [
-      onMoveShouldSetResponder,
-      onMoveShouldSetResponderCapture,
-      onResponderEnd,
-      onResponderGrant,
-      onResponderMove,
-      onResponderReject,
-      onResponderRelease,
-      onResponderStart,
-      onResponderTerminate,
-      onResponderTerminationRequest,
-      onStartShouldSetResponder,
-      onStartShouldSetResponderCapture,
-    ]);
-    useResponderEvents(fowardRef, responderProps);
-    const setRef = useMergeRefs(fowardRef, platformMethodsRef);
-    const Container = uce('span', {
+    const platformMethodsRef = usePlatformMethods({ classList, style, ...finalProps })
+
+    const setRef = useMergeRefs(hostRef, platformMethodsRef, forwardedRef)
+
+    return uce('span', {
       ref: setRef,
-      onClick,
       style: containerStyle,
-      ...supportedContainerProps,
-    });
-    return <Container>{Svg}</Container>;
+      ...finalProps,
+    }, Svg);
   },
 );
 
@@ -455,6 +432,25 @@ function parseSVG(svg: string) {
   ].map(([, key, , value]) => ({ [key]: value }));
   return { attributes, innerHTML };
 }
+
+const styleSheet = StyleSheet.create({
+  view: {
+    alignItems: 'stretch',
+    border: '0 solid black',
+    boxSizing: 'border-box',
+    display: 'flex',
+    flexBasis: 'auto',
+    flexDirection: 'column',
+    flexShrink: 0,
+    margin: 0,
+    minHeight: 0,
+    minWidth: 0,
+    padding: 0,
+    position: 'relative',
+    zIndex: 0,
+  },
+})
+const classList = [styleSheet.view]
 
 interface ParsedProp {
   [key: string]: unknown;
