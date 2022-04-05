@@ -11,6 +11,21 @@ import useElementLayout from 'react-native-web/dist/modules/useElementLayout';
 import usePlatformMethods from 'react-native-web/dist/modules/usePlatformMethods';
 import useResponderEvents from 'react-native-web/dist/modules/useResponderEvents';
 import useMergeRefs from 'react-native-web/dist/modules/useMergeRefs';
+import * as forwardedProps from 'react-native-web/dist/modules/forwardedProps'
+import pick from 'react-native-web/dist/modules/pick'
+
+const forwardPropsList = {
+  ...forwardedProps.defaultProps,
+  ...forwardedProps.accessibilityProps,
+  ...forwardedProps.clickProps,
+  ...forwardedProps.focusProps,
+  ...forwardedProps.keyboardProps,
+  ...forwardedProps.mouseProps,
+  ...forwardedProps.touchProps,
+  ...forwardedProps.styleProps,
+}
+
+const pickProps = (props: ViewProps) => pick(props, forwardPropsList)
 
 // rgba values inside range 0 to 1 inclusive
 // rgbaArray = [r, g, b, a]
@@ -239,7 +254,7 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       return transformArray.length ? transformArray.join(' ') : undefined;
     }, [originX, originY, rotation, scale, skewX, skewY, transform, translate]);
 
-    const svgStyle = React.useMemo(() => {
+    const { svgStyle, containerStyle } = React.useMemo(() => {
       const [, , widthBox, heightBox] = (viewBox || '').split(' ');
       const {
         width: styleWidth,
@@ -248,14 +263,18 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
         minWidth,
         maxHeight,
         maxWidth,
+        ...containerStyle
       } = StyleSheet.flatten(style);
       return {
-        width: width || styleWidth || svgAttributes.width || widthBox,
-        height: height || styleHeight || svgAttributes.height || heightBox,
-        minHeight,
-        minWidth,
-        maxHeight,
-        maxWidth,
+        svgStyle: {
+          width: width || styleWidth || svgAttributes.width || widthBox,
+          height: height || styleHeight || svgAttributes.height || heightBox,
+          minHeight,
+          minWidth,
+          maxHeight,
+          maxWidth,
+        },
+        containerStyle
       };
     }, [
       svgAttributes.height,
@@ -265,19 +284,6 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       viewBox,
       width,
     ]);
-
-    const containerStyle = React.useMemo(() => {
-      const propStyle = StyleSheet.flatten(style) as TextStyle;
-      delete propStyle.width;
-      delete propStyle.height;
-      delete propStyle.minWidth;
-      delete propStyle.minHeight;
-      delete propStyle.maxWidth;
-      delete propStyle.maxHeight;
-      propStyle.display = 'inline-flex' as 'flex';
-      propStyle.color = 'inherit';
-      return propStyle;
-    }, [style]);
 
     // these props should override the xml props
     const overrideProps = React.useMemo(
@@ -361,6 +367,8 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       ...finalProps
     } = containerProps
 
+    const finalContainerProps = pickProps(finalProps)
+
     const hostRef = React.useRef<HTMLDivElement>(null)
     useElementLayout(hostRef, onLayout)
     const responderConfig = React.useMemo(
@@ -395,14 +403,14 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
     )
     useResponderEvents(hostRef, responderConfig)
 
-    const platformMethodsRef = usePlatformMethods({ classList, style, ...finalProps })
+    const platformMethodsRef = usePlatformMethods({ ...finalContainerProps, classList, style })
 
     const setRef = useMergeRefs(hostRef, platformMethodsRef, forwardedRef)
 
     return uce('span', {
+      ...finalContainerProps,
       ref: setRef,
       style: containerStyle,
-      ...finalProps,
     }, Svg);
   },
 );
@@ -438,9 +446,10 @@ const styleSheet = StyleSheet.create({
     alignItems: 'stretch',
     border: '0 solid black',
     boxSizing: 'border-box',
-    display: 'flex',
+    display: 'inline-flex' as 'flex',
     flexBasis: 'auto',
     flexDirection: 'column',
+    color: 'inherit',
     flexShrink: 0,
     margin: 0,
     minHeight: 0,
