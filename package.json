@@ -22,7 +22,9 @@
     "android",
     "apple",
     "elements",
-    "RNSVG.podspec"
+    "RNSVG.podspec",
+    "index.d.ts",
+    "index.js.flow"
   ],
   "@react-native-community/bob": {
     "source": "src",
