@@ -12,6 +12,7 @@ import useResponderEvents from 'react-native-web/dist/modules/useResponderEvents
 import useMergeRefs from 'react-native-web/dist/modules/useMergeRefs';
 import * as forwardedProps from 'react-native-web/dist/modules/forwardedProps'
 import pick from 'react-native-web/dist/modules/pick'
+import css from 'react-native-web/dist/exports/StyleSheet/css';
 
 const forwardPropsList = {
   ...forwardedProps.defaultProps,
@@ -24,7 +25,7 @@ const forwardPropsList = {
   ...forwardedProps.styleProps,
 }
 
-const pickProps = (props: ViewProps) => pick(props, forwardPropsList)
+const pickProps = (props: ViewProps & { classList: unknown[] }) => pick(props, forwardPropsList)
 
 // rgba values inside range 0 to 1 inclusive
 // rgbaArray = [r, g, b, a]
@@ -366,7 +367,7 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       ...finalProps
     } = containerProps
 
-    const finalContainerProps = pickProps({ ...finalProps, style: containerStyle })
+    const finalContainerProps = pickProps({ ...finalProps, classList, style: containerStyle })
 
     const hostRef = React.useRef<HTMLDivElement>(null)
     useElementLayout(hostRef, onLayout)
@@ -402,15 +403,12 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
     )
     useResponderEvents(hostRef, responderConfig)
 
-    const platformMethodsRef = usePlatformMethods({ ...finalContainerProps, classList })
+    const platformMethodsRef = usePlatformMethods(finalContainerProps)
 
     const setRef = useMergeRefs(hostRef, platformMethodsRef, forwardedRef)
+    finalContainerProps.ref = setRef
 
-    return uce('span', {
-      ...finalContainerProps,
-      classList,
-      ref: setRef,
-    }, Svg);
+    return uce('span', finalContainerProps, Svg);
   },
 );
 
@@ -440,7 +438,7 @@ function parseSVG(svg: string) {
   return { attributes, innerHTML };
 }
 
-const styleSheet = StyleSheet.create({
+const styleSheet = css.create({
   view: {
     alignItems: 'stretch',
     border: '0 solid black',
