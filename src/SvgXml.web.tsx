@@ -366,7 +366,7 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       ...finalProps
     } = containerProps
 
-    const finalContainerProps = pickProps(finalProps)
+    const finalContainerProps = pickProps({ ...finalProps, style: containerStyle })
 
     const hostRef = React.useRef<HTMLDivElement>(null)
     useElementLayout(hostRef, onLayout)
@@ -402,7 +402,7 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
     )
     useResponderEvents(hostRef, responderConfig)
 
-    const platformMethodsRef = usePlatformMethods({ ...finalContainerProps, classList, containerStyle })
+    const platformMethodsRef = usePlatformMethods({ ...finalContainerProps, classList })
 
     const setRef = useMergeRefs(hostRef, platformMethodsRef, forwardedRef)
 
@@ -410,7 +410,6 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       ...finalContainerProps,
       classList,
       ref: setRef,
-      style: containerStyle,
     }, Svg);
   },
 );
