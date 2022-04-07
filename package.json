@@ -58,7 +58,7 @@
     "semantic-release": "semantic-release",
     "test": "npm run lint && npm run tsc && npm run flow && npm run jest",
     "tsc": "tsc --noEmit",
-    "release": "release-it"
+    "release": "npm run prepare && release-it"
   },
   "peerDependencies": {
     "react": "*",
