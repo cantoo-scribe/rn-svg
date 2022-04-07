@@ -217,6 +217,7 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       rotation,
       skewX,
       skewY,
+      pointerEvents = 'none',
       style,
       // props that should be applyed to the View container
       ...containerProps
@@ -264,7 +265,7 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
         maxHeight,
         maxWidth,
         ...containerStyle
-      } = StyleSheet.flatten(style);
+      } = (StyleSheet.flatten(style) || {});
       return {
         svgStyle: {
           width: width || styleWidth || svgAttributes.width || widthBox,
@@ -310,7 +311,7 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
           clipRule,
           clipPath,
           vectorEffect,
-          pointerEvents: 'none',
+          pointerEvents,
           id,
           markerStart,
           markerMid,
