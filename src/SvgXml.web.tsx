@@ -317,6 +317,8 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
           markerMid,
           markerEnd,
           mask,
+          width: svgStyle.width,
+          height: svgStyle.height
         }),
       }),
       [
