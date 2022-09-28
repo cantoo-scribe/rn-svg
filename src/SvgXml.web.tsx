@@ -223,7 +223,7 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       ...containerProps
     } = props;
 
-    const svgTransform = React.useMemo<string>(() => {
+    const svgTransform = React.useMemo<string | undefined>(() => {
       const transformArray: string[] = [];
       if (originX != null || originY != null) {
         transformArray.push(`translate(${originX || 0}, ${originY || 0})`);
@@ -267,14 +267,14 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
         ...containerStyle
       } = (StyleSheet.flatten(style) || {});
       return {
-        svgStyle: {
-          width: width || styleWidth || svgAttributes.width || widthBox,
-          height: height || styleHeight || svgAttributes.height || heightBox,
+        svgStyle: removeUndefined({
+          width: Number(width ?? styleWidth ?? svgAttributes.width ?? widthBox),
+          height: Number(height ?? styleHeight ?? svgAttributes.height ?? heightBox),
           minHeight,
           minWidth,
           maxHeight,
-          maxWidth,
-        },
+          maxWidth
+        }),
         containerStyle
       };
     }, [
@@ -422,8 +422,8 @@ export default SvgXml;
 /** polyfill for Node < 12 */
 function matchAll(str: string) {
   return (re: RegExp) => {
-    const matches = [];
-    let groups;
+    const matches: RegExpExecArray[] = [];
+    let groups: RegExpExecArray | null;
     while ((groups = re.exec(str))) {
       matches.push(groups);
     }
