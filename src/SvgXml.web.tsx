@@ -268,8 +268,8 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       } = (StyleSheet.flatten(style) || {});
       return {
         svgStyle: removeUndefined({
-          width: Number(width ?? styleWidth ?? svgAttributes.width ?? widthBox),
-          height: Number(height ?? styleHeight ?? svgAttributes.height ?? heightBox),
+          width: parseDimension(width ?? styleWidth ?? svgAttributes.width ?? widthBox),
+          height: parseDimension(height ?? styleHeight ?? svgAttributes.height ?? heightBox),
           minHeight,
           minWidth,
           maxHeight,
@@ -461,12 +461,12 @@ const styleSheet = css.create({
 })
 const classList = [styleSheet.view]
 
-interface ParsedProp {
-  [key: string]: unknown;
+interface ParsedProp<T> {
+  [key: string]: T | undefined;
 }
 
-function kebabToCamel(attrs: ParsedProp[]) {
-  const camelObj: ParsedProp = {};
+function kebabToCamel<T>(attrs: ParsedProp<T>[]) {
+  const camelObj: ParsedProp<T> = {};
   attrs.forEach(attr => {
     const key = Object.keys(attr)[0];
     camelObj[key.replace(/-./g, x => x.toUpperCase()[1])] = attr[key];
@@ -474,12 +474,20 @@ function kebabToCamel(attrs: ParsedProp[]) {
   return camelObj;
 }
 
-function removeUndefined(obj: ParsedProp) {
-  const finalObj: ParsedProp = {};
+function removeUndefined<T>(obj: ParsedProp<T>) {
+  const finalObj: Record<string, T> = {};
   Object.keys(obj).forEach(key => {
-    if (obj[key] !== undefined) {
-      finalObj[key] = obj[key];
+    const value = obj[key]
+    if (value !== undefined) {
+      finalObj[key] = value;
     }
   });
   return finalObj;
+}
+
+/** Ensure that the dimension is valid for React Native */
+function parseDimension(dimension: string | number | undefined) {
+  if (typeof dimension === 'number') return dimension
+  else if (!dimension) return dimension
+  else return dimension.endsWith('%') ? dimension : Number(dimension)
 }
