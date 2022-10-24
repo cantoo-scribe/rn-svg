@@ -485,5 +485,5 @@ function removeUndefined<T>(obj: ParsedProp<T>) {
 function parseDimension(dimension: string | number | undefined) {
   if (typeof dimension === 'number') return dimension
   else if (!dimension) return dimension
-  else return dimension.endsWith('%') ? dimension : Number(dimension)
+  else return dimension.endsWith('%') ? dimension : Number.parseFloat(dimension)
 }
