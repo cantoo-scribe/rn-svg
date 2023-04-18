@@ -7,9 +7,11 @@
 
 [Check out the demo](https://snack.expo.io/@msand/react-native-svg-example)
 
-## Looking for maintainers
+## Forked by [Cantoo](https://cantoo.fr)
 
-https://github.com/react-native-svg/react-native-svg/issues/1554
+This is a fork of [react-native-svg](https://github.com/software-mansion/react-native-svg). We did this fork to provide support for SvgUri and SvgXml component in React-Native-Web.
+
+We will use and maintain this fork from now on, but we probably won't handle issues too far from our roadmap.
 
 ## Features
 

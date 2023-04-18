@@ -130,7 +130,7 @@
   "directories": {
     "lib": "lib"
   },
-  "author": "sharcoux",
+  "author": "Cantoo",
   "react-native-builder-bob": {
     "source": "src",
     "output": "lib",
