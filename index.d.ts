@@ -47,6 +47,7 @@ export type TextDecoration =
   | 'blink';
 export type FontVariantLigatures = 'normal' | 'none';
 export type AlignmentBaseline =
+  | 'auto'
   | 'baseline'
   | 'text-bottom'
   | 'alphabetic'
@@ -424,6 +425,7 @@ export const TSpan: React.ComponentClass<TSpanProps>;
 export type TSpan = React.ComponentClass<TSpanProps>;
 
 export interface TextSpecificProps extends CommonPathProps, FontProps {
+  dominantBaseline?: AlignmentBaseline;
   alignmentBaseline?: AlignmentBaseline;
   baselineShift?: BaselineShift;
   verticalAlign?: NumberProp;

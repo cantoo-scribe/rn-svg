@@ -49,6 +49,7 @@ export type TextDecoration =
   | "blink";
 export type FontVariantLigatures = "normal" | "none";
 export type AlignmentBaseline =
+  | "auto"
   | "baseline"
   | "text-bottom"
   | "alphabetic"
@@ -378,6 +379,7 @@ export type TSpanProps = {
 declare export var TSpan: React.ComponentClass<TSpanProps>;
 export type TSpanType = React.ComponentClass<TSpanProps>;
 export type TextSpecificProps = {
+  dominantBaseline?: AlignmentBaseline,
   alignmentBaseline?: AlignmentBaseline,
   baselineShift?: BaselineShift,
   verticalAlign?: NumberProp,
