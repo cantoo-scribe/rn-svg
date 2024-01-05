@@ -108,20 +108,20 @@ const prepare = <T extends BaseProps>(
   } = {
     ...(hasTouchableProperty
       ? {
-        onStartShouldSetResponder:
-          self.touchableHandleStartShouldSetResponder,
-        onResponderTerminationRequest:
-          self.touchableHandleResponderTerminationRequest,
-        onResponderGrant: self.touchableHandleResponderGrant,
-        onResponderMove: self.touchableHandleResponderMove,
-        onResponderRelease: self.touchableHandleResponderRelease,
-        onResponderTerminate: self.touchableHandleResponderTerminate,
-      }
+          onStartShouldSetResponder:
+            self.touchableHandleStartShouldSetResponder,
+          onResponderTerminationRequest:
+            self.touchableHandleResponderTerminationRequest,
+          onResponderGrant: self.touchableHandleResponderGrant,
+          onResponderMove: self.touchableHandleResponderMove,
+          onResponderRelease: self.touchableHandleResponderRelease,
+          onResponderTerminate: self.touchableHandleResponderTerminate,
+        }
       : null),
     ...rest,
   };
 
-  const transform = [];
+  const transform: String[] = [];
 
   if (originX != null || originY != null) {
     transform.push(`translate(${originX || 0}, ${originY || 0})`);
@@ -211,7 +211,11 @@ const measureLayout = (
     setTimeout(() => {
       // @ts-ignore
       const relativeRect = getBoundingClientRect(relativeNode);
-      const { height, left, top, width } = getBoundingClientRect(node);
+      const nodeRect = getBoundingClientRect(node);
+      if (!nodeRect || !relativeRect) {
+        return;
+      }
+      const { height, left, top, width } = nodeRect;
       const x = left - relativeRect.left;
       const y = top - relativeRect.top;
       callback(x, y, width, height, left, top);
@@ -231,8 +235,8 @@ function remeasure() {
 
 export class WebShape<
   P extends BaseProps = BaseProps,
-  C = {}
-  > extends React.Component<P, C> {
+  C = {},
+> extends React.Component<P, C> {
   [x: string]: unknown;
   _remeasureMetricsOnActivation: () => void;
   touchableHandleStartShouldSetResponder?: (

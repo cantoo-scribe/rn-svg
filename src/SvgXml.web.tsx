@@ -10,9 +10,9 @@ import useElementLayout from 'react-native-web/dist/modules/useElementLayout';
 import usePlatformMethods from 'react-native-web/dist/modules/usePlatformMethods';
 import useResponderEvents from 'react-native-web/dist/modules/useResponderEvents';
 import useMergeRefs from 'react-native-web/dist/modules/useMergeRefs';
-import * as forwardedProps from 'react-native-web/dist/modules/forwardedProps'
-import pick from 'react-native-web/dist/modules/pick'
-import css from 'react-native-web/dist/exports/StyleSheet/css';
+import * as forwardedProps from 'react-native-web/dist/modules/forwardedProps';
+import pick from 'react-native-web/dist/modules/pick';
+import type { Animated } from 'react-native-web';
 
 const forwardPropsList = {
   ...forwardedProps.defaultProps,
@@ -23,9 +23,10 @@ const forwardPropsList = {
   ...forwardedProps.mouseProps,
   ...forwardedProps.touchProps,
   ...forwardedProps.styleProps,
-}
+};
 
-const pickProps = (props: ViewProps & { classList: unknown[] }) => pick(props, forwardPropsList)
+const pickProps = (props: ViewProps & { classList: unknown[] }) =>
+  pick(props, forwardPropsList);
 
 // rgba values inside range 0 to 1 inclusive
 // rgbaArray = [r, g, b, a]
@@ -107,12 +108,12 @@ interface ResponderProps extends GestureResponderHandlers {
 }
 interface VectorEffectProps {
   vectorEffect?:
-  | 'none'
-  | 'non-scaling-stroke'
-  | 'nonScalingStroke'
-  | 'default'
-  | 'inherit'
-  | 'uri';
+    | 'none'
+    | 'non-scaling-stroke'
+    | 'nonScalingStroke'
+    | 'default'
+    | 'inherit'
+    | 'uri';
 }
 
 interface TouchableProps {
@@ -142,15 +143,15 @@ interface CommonMaskProps {
 
 interface CommonPathProps
   extends FillProps,
-  StrokeProps,
-  ClipProps,
-  TransformProps,
-  VectorEffectProps,
-  ResponderProps,
-  TouchableProps,
-  DefinitionProps,
-  CommonMarkerProps,
-  CommonMaskProps { }
+    StrokeProps,
+    ClipProps,
+    TransformProps,
+    VectorEffectProps,
+    ResponderProps,
+    TouchableProps,
+    DefinitionProps,
+    CommonMarkerProps,
+    CommonMaskProps {}
 interface GProps extends CommonPathProps {
   opacity?: NumberProp;
 }
@@ -260,18 +261,26 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       const {
         width: styleWidth,
         height: styleHeight,
-        ...containerStyle
-      } = (StyleSheet.flatten(style) || {});
+        ...otherStyle
+      } = StyleSheet.flatten(style) || {};
       return {
         svgStyle: removeUndefined({
-          width: parseDimension(width ?? styleWidth ?? svgAttributes.width ?? widthBox),
-          height: parseDimension(height ?? styleHeight ?? svgAttributes.height ?? heightBox),
-          minHeight: String(containerStyle.minHeight).endsWith('%') ? '100%' : containerStyle.minHeight,
-          minWidth: String(containerStyle.minWidth).endsWith('%') ? '100%' : containerStyle.minWidth,
-          maxHeight: "100%",
-          maxWidth: "100%"
+          width: parseDimension(
+            width ?? styleWidth ?? svgAttributes.width ?? widthBox,
+          ),
+          height: parseDimension(
+            height ?? styleHeight ?? svgAttributes.height ?? heightBox,
+          ),
+          minHeight: String(otherStyle.minHeight).endsWith('%')
+            ? '100%'
+            : otherStyle.minHeight,
+          minWidth: String(otherStyle.minWidth).endsWith('%')
+            ? '100%'
+            : otherStyle.minWidth,
+          maxHeight: '100%',
+          maxWidth: '100%',
         }),
-        containerStyle,
+        containerStyle: otherStyle,
       };
     }, [
       svgAttributes.height,
@@ -314,36 +323,37 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
           markerEnd,
           mask,
           width: svgStyle.width,
-          height: svgStyle.height
+          height: svgStyle.height,
         }),
       }),
       [
         svgAttributes,
-        clipPath,
-        clipRule,
+        svgStyle,
+        svgTransform,
+        viewBox,
+        preserveAspectRatio,
+        title,
+        opacity,
         fill,
         fillOpacity,
         fillRule,
-        id,
-        markerEnd,
-        markerMid,
-        markerStart,
-        mask,
-        opacity,
-        preserveAspectRatio,
         stroke,
+        strokeWidth,
+        strokeOpacity,
         strokeDasharray,
         strokeDashoffset,
         strokeLinecap,
         strokeLinejoin,
         strokeMiterlimit,
-        strokeOpacity,
-        strokeWidth,
-        svgStyle,
-        svgTransform,
-        title,
+        clipRule,
+        clipPath,
         vectorEffect,
-        viewBox,
+        pointerEvents,
+        id,
+        markerStart,
+        markerMid,
+        markerEnd,
+        mask,
       ],
     );
 
@@ -364,12 +374,16 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       onStartShouldSetResponder,
       onStartShouldSetResponderCapture,
       ...finalProps
-    } = containerProps
+    } = containerProps;
 
-    const finalContainerProps = pickProps({ ...finalProps, classList, style: containerStyle })
+    const finalContainerProps = pickProps({
+      ...finalProps,
+      classList,
+      style: containerStyle,
+    });
 
-    const hostRef = React.useRef<HTMLDivElement>(null)
-    useElementLayout(hostRef, onLayout)
+    const hostRef = React.useRef<HTMLDivElement>(null);
+    useElementLayout(hostRef, onLayout);
     const responderConfig = React.useMemo(
       () => ({
         onMoveShouldSetResponder,
@@ -398,14 +412,14 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
         onResponderTerminationRequest,
         onStartShouldSetResponder,
         onStartShouldSetResponderCapture,
-      ]
-    )
-    useResponderEvents(hostRef, responderConfig)
+      ],
+    );
+    useResponderEvents(hostRef, responderConfig);
 
-    const platformMethodsRef = usePlatformMethods(finalContainerProps)
+    const platformMethodsRef = usePlatformMethods(finalContainerProps);
 
-    const setRef = useMergeRefs(hostRef, platformMethodsRef, forwardedRef)
-    finalContainerProps.ref = setRef
+    const setRef = useMergeRefs(hostRef, platformMethodsRef, forwardedRef);
+    finalContainerProps.ref = setRef;
 
     return uce('span', finalContainerProps, Svg);
   },
@@ -437,11 +451,13 @@ function parseSVG(svg: string) {
   return { attributes, innerHTML };
 }
 
-const styleSheet = css.create({
-  view: {
+const styleSheet = StyleSheet.create({
+  view$raw: {
     alignItems: 'stretch',
-    border: '0 solid black',
-    boxSizing: 'border-box',
+    backgroundColor: 'transparent',
+    // Hack because those are web props unknown from react-native
+    ['border' as 'borderColor']: '0 solid black',
+    ['boxSizing' as 'borderBlockColor']: 'border-box',
     display: 'inline-flex' as 'flex',
     flexBasis: 'auto',
     flexDirection: 'column',
@@ -454,8 +470,8 @@ const styleSheet = css.create({
     position: 'relative',
     zIndex: 0,
   },
-})
-const classList = [styleSheet.view]
+});
+const classList = [styleSheet.view$raw];
 
 interface ParsedProp<T> {
   [key: string]: T | undefined;
@@ -463,17 +479,17 @@ interface ParsedProp<T> {
 
 function kebabToCamel<T>(attrs: ParsedProp<T>[]) {
   const camelObj: ParsedProp<T> = {};
-  attrs.forEach(attr => {
+  attrs.forEach((attr) => {
     const key = Object.keys(attr)[0];
-    camelObj[key.replace(/-./g, x => x.toUpperCase()[1])] = attr[key];
+    camelObj[key.replace(/-./g, (x) => x.toUpperCase()[1])] = attr[key];
   });
   return camelObj;
 }
 
 function removeUndefined<T>(obj: ParsedProp<T>) {
   const finalObj: Record<string, T> = {};
-  Object.keys(obj).forEach(key => {
-    const value = obj[key]
+  Object.keys(obj).forEach((key) => {
+    const value = obj[key];
     if (value !== undefined) {
       finalObj[key] = value;
     }
@@ -482,8 +498,14 @@ function removeUndefined<T>(obj: ParsedProp<T>) {
 }
 
 /** Ensure that the dimension is valid for React Native */
-function parseDimension(dimension: string | number | undefined) {
-  if (typeof dimension === 'number') return dimension
-  else if (!dimension) return dimension
-  else return dimension.endsWith('%') ? dimension : Number.parseFloat(dimension)
+function parseDimension(
+  dimension: string | number | Animated.AnimatedNode | undefined,
+) {
+  if (typeof dimension === 'number') {
+    return dimension;
+  } else if (!dimension) {
+    return dimension;
+  } else {
+    return dimension.endsWith('%') ? dimension : Number.parseFloat(dimension);
+  }
 }

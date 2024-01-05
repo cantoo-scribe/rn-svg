@@ -55,7 +55,6 @@
     "lint": "eslint --ext .ts,.tsx src",
     "peg": "pegjs -o src/lib/extract/transform.js ./src/lib/extract/transform.peg",
     "prepare": "npm run flowgen && npm run bob",
-    "semantic-release": "semantic-release",
     "test": "npm run lint && npm run tsc && npm run flow && npm run jest",
     "tsc": "tsc --noEmit",
     "release": "npm run prepare && release-it"
@@ -70,11 +69,9 @@
     "css-tree": "^1.0.0-alpha.39"
   },
   "devDependencies": {
-    "@babel/compat-data": "^7.17.7",
-    "@react-native-community/eslint-config": "3.0.1",
-    "@react-native-community/eslint-plugin": "^1.1.0",
-    "@semantic-release/changelog": "^5.0.0",
-    "@semantic-release/git": "^9.0.0",
+    "@babel/compat-data": ">=7.17.7",
+    "@react-native-community/eslint-config": "^3.2.0",
+    "@react-native-community/eslint-plugin": "^1.3.0",
     "@types/css-tree": "^1.0.3",
     "@types/react": "^17.0.43",
     "@types/react-native": "^0.67.3",
@@ -88,33 +85,22 @@
     "flow-typed": "^3.7.0",
     "flowgen": "^1.17.0",
     "jest": "^25.1.0",
+    "metro-react-native-babel-preset": ">=0.66.0",
     "pegjs": "^0.10.0",
     "prettier": "^2.6.2",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-native": "^0.68.0",
-    "react-native-builder-bob": "^0.18.2",
-    "react-native-web": "^0.17.7",
-    "react-test-renderer": "^17.0.2",
+    "react": ">=17.0.2",
+    "react-dom": ">=17.0.2",
+    "react-native": ">=0.68.0",
+    "react-native-builder-bob": ">=0.18.2",
+    "react-native-web": ">=0.17.7",
+    "react-test-renderer": ">=17.0.2",
     "release-it": "^13.6.8",
-    "semantic-release": "^19.0.2",
-    "semantic-release-cli": "^5.4.4",
-    "typescript": "^4.6.3"
+    "typescript": ">=4.6.3"
   },
   "jest": {
     "preset": "react-native",
     "modulePathIgnorePatterns": [
       "<rootDir>/lib/"
-    ]
-  },
-  "release": {
-    "plugins": [
-      "@semantic-release/commit-analyzer",
-      "@semantic-release/release-notes-generator",
-      "@semantic-release/changelog",
-      "@semantic-release/npm",
-      "@semantic-release/github",
-      "@semantic-release/git"
     ]
   },
   "publishConfig": {

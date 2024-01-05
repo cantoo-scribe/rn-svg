@@ -16,11 +16,7 @@ const SvgUri = React.forwardRef<HTMLOrSVGElement, UriProps>(
     const { onError = err, uri } = props;
     const [xml, setXml] = useState<string | null>(null);
     useEffect(() => {
-      uri
-        ? fetchText(uri)
-            .then(setXml)
-            .catch(onError)
-        : setXml(null);
+      uri ? fetchText(uri).then(setXml).catch(onError) : setXml(null);
     }, [onError, uri]);
     return <SvgXml ref={forwardRef} xml={xml} override={props as SvgProps} />;
   },
