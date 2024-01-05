@@ -379,6 +379,7 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
     const finalContainerProps = pickProps({
       ...finalProps,
       classList,
+      children: Svg,
       style: containerStyle,
     });
 
