@@ -280,7 +280,7 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
           maxHeight: '100%',
           maxWidth: '100%',
         }),
-        containerStyle: otherStyle,
+        containerStyle: { ...otherStyle, display: 'inline-flex' as 'flex' },
       };
     }, [
       svgAttributes.height,
@@ -422,7 +422,7 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
     const setRef = useMergeRefs(hostRef, platformMethodsRef, forwardedRef);
     finalContainerProps.ref = setRef;
 
-    return uce('span', finalContainerProps, Svg);
+    return uce('span', finalContainerProps);
   },
 );
 
