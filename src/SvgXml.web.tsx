@@ -25,8 +25,7 @@ const forwardPropsList = {
   ...forwardedProps.styleProps,
 };
 
-const pickProps = (props: ViewProps & { classList: unknown[] }) =>
-  pick(props, forwardPropsList);
+const pickProps = (props: ViewProps) => pick(props, forwardPropsList);
 
 // rgba values inside range 0 to 1 inclusive
 // rgbaArray = [r, g, b, a]
@@ -280,7 +279,10 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
           maxHeight: '100%',
           maxWidth: '100%',
         }),
-        containerStyle: { ...otherStyle, display: 'inline-flex' as 'flex' },
+        containerStyle: [
+          styleSheet.view$raw,
+          { ...otherStyle, display: 'inline-flex' as 'flex' },
+        ],
       };
     }, [
       svgAttributes.height,
@@ -378,7 +380,6 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
 
     const finalContainerProps = pickProps({
       ...finalProps,
-      classList,
       children: Svg,
       style: containerStyle,
     });
@@ -472,7 +473,6 @@ const styleSheet = StyleSheet.create({
     zIndex: 0,
   },
 });
-const classList = [styleSheet.view$raw];
 
 interface ParsedProp<T> {
   [key: string]: T | undefined;
