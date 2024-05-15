@@ -507,6 +507,8 @@ function parseDimension(
   } else if (!dimension) {
     return dimension;
   } else {
-    return dimension.endsWith('%') ? dimension : Number.parseFloat(dimension);
+    return dimension.trim().match(/\d+(\.\d+)?/)
+      ? Number.parseFloat(dimension)
+      : dimension;
   }
 }
