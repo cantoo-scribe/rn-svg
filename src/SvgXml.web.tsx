@@ -278,6 +278,8 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
             : otherStyle.minWidth,
           maxHeight: '100%',
           maxWidth: '100%',
+          flexGrow: 1,
+          flexShrink: 1,
         }),
         containerStyle: [
           styleSheet.view$raw,
