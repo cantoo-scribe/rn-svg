@@ -255,42 +255,26 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       return transformArray.length ? transformArray.join(' ') : undefined;
     }, [originX, originY, rotation, scale, skewX, skewY, transform, translate]);
 
-    const { svgStyle, containerStyle } = React.useMemo(() => {
+    const containerStyle = React.useMemo(() => {
       const [, , widthBox, heightBox] = (viewBox || '').split(' ');
       const {
         width: styleWidth,
         height: styleHeight,
         ...otherStyle
       } = StyleSheet.flatten(style) || {};
-      return {
-        svgStyle: removeUndefined({
-          width: '100%',
-          height: '100%',
-          flexGrow: 1,
-          flexShrink: 1,
-        }),
-        containerStyle: [
-          styleSheet.view$raw,
-          {
-            ...otherStyle,
-            display: 'inline-flex' as 'flex',
-            width: parseDimension(
-              width ?? styleWidth ?? svgAttributes.width ?? widthBox,
-            ),
-            height: parseDimension(
-              height ?? styleHeight ?? svgAttributes.height ?? heightBox,
-            ),
-            minHeight: String(otherStyle.minHeight).endsWith('%')
-              ? '100%'
-              : otherStyle.minHeight,
-            minWidth: String(otherStyle.minWidth).endsWith('%')
-              ? '100%'
-              : otherStyle.minWidth,
-            maxHeight: '100%',
-            maxWidth: '100%',
-          } as const,
-        ],
-      };
+      return [
+        styleSheet.view$raw,
+        removeUndefined({
+          ...otherStyle,
+          display: 'inline-flex' as 'flex',
+          width: parseDimension(
+            width ?? styleWidth ?? svgAttributes.width ?? widthBox,
+          ),
+          height: parseDimension(
+            height ?? styleHeight ?? svgAttributes.height ?? heightBox,
+          ),
+        } as const),
+      ];
     }, [
       svgAttributes.height,
       svgAttributes.width,
@@ -305,7 +289,7 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       () => ({
         ...removeUndefined(svgAttributes),
         ...removeUndefined({
-          style: svgStyle,
+          style: styleSheet.svg,
           transform: svgTransform,
           viewBox,
           preserveAspectRatio,
@@ -331,13 +315,12 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
           markerMid,
           markerEnd,
           mask,
-          width: svgStyle.width,
-          height: svgStyle.height,
         }),
+        width: undefined,
+        height: undefined,
       }),
       [
         svgAttributes,
-        svgStyle,
         svgTransform,
         viewBox,
         preserveAspectRatio,
@@ -461,6 +444,10 @@ function parseSVG(svg: string) {
 }
 
 const styleSheet = StyleSheet.create({
+  svg: {
+    flexGrow: 1,
+    flexShrink: 1,
+  },
   view$raw: {
     alignItems: 'stretch',
     backgroundColor: 'transparent',
