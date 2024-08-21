@@ -264,26 +264,31 @@ const SvgXml = React.forwardRef<HTMLOrSVGElement, XmlProps>(
       } = StyleSheet.flatten(style) || {};
       return {
         svgStyle: removeUndefined({
-          width: parseDimension(
-            width ?? styleWidth ?? svgAttributes.width ?? widthBox,
-          ),
-          height: parseDimension(
-            height ?? styleHeight ?? svgAttributes.height ?? heightBox,
-          ),
-          minHeight: String(otherStyle.minHeight).endsWith('%')
-            ? '100%'
-            : otherStyle.minHeight,
-          minWidth: String(otherStyle.minWidth).endsWith('%')
-            ? '100%'
-            : otherStyle.minWidth,
-          maxHeight: '100%',
-          maxWidth: '100%',
+          width: '100%',
+          height: '100%',
           flexGrow: 1,
           flexShrink: 1,
         }),
         containerStyle: [
           styleSheet.view$raw,
-          { ...otherStyle, display: 'inline-flex' as 'flex' },
+          {
+            ...otherStyle,
+            display: 'inline-flex' as 'flex',
+            width: parseDimension(
+              width ?? styleWidth ?? svgAttributes.width ?? widthBox,
+            ),
+            height: parseDimension(
+              height ?? styleHeight ?? svgAttributes.height ?? heightBox,
+            ),
+            minHeight: String(otherStyle.minHeight).endsWith('%')
+              ? '100%'
+              : otherStyle.minHeight,
+            minWidth: String(otherStyle.minWidth).endsWith('%')
+              ? '100%'
+              : otherStyle.minWidth,
+            maxHeight: '100%',
+            maxWidth: '100%',
+          } as const,
         ],
       };
     }, [
